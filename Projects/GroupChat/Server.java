@@ -1,11 +1,13 @@
 package Projects.GroupChat;
 
+import java.io.DataOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server
 {
     private ServerSocket serverSocket;
+
     private Server(int port) {
         try {
             this.serverSocket = new ServerSocket(port);
@@ -45,6 +47,7 @@ public class Server
         try {
             if(serverSocket!=null)
             {
+
                 serverSocket.close();
             }
         }

@@ -2,6 +2,7 @@ package Projects.GroupChat;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 
@@ -11,6 +12,7 @@ public class ClientHandler implements Runnable{
     private DataOutputStream outputStream;
     private DataInputStream inputStream;
     private String clientName;
+
     public ClientHandler(Socket socket)
     {
         this.socket = socket;
@@ -19,7 +21,7 @@ public class ClientHandler implements Runnable{
             inputStream = new DataInputStream(socket.getInputStream());
             clientName = inputStream.readUTF();
             clients.add(this);
-            broadCastMessage(" has joined the room.");
+            broadCastMessage(clientName+" has joined the room.");
 
         }
         catch (Exception e)
@@ -32,10 +34,10 @@ public class ClientHandler implements Runnable{
 
 
             clients.forEach((i)->{
-                if(i.clientName!=this.clientName)
+                if(i!=this)
                 {
                     try {
-                        i.outputStream.writeUTF("\nServer: "+clientName+": "+msg);
+                        i.outputStream.writeUTF(msg);
                         i.outputStream.flush();
                     }
                     catch (Exception e)
@@ -81,7 +83,7 @@ public class ClientHandler implements Runnable{
         {
             try {
                 msg = inputStream.readUTF();
-                broadCastMessage(msg);
+                broadCastMessage(clientName+": "+msg);
             }
             catch (Exception e)
             {
@@ -94,12 +96,10 @@ public class ClientHandler implements Runnable{
     private void leftRoom()
     {
 
-        broadCastMessage("has left the room.");
+        broadCastMessage(clientName+" has left the room.");
         clients.remove(this);
 
     }
 
-    public static void main(String[] args) {
 
-    }
 }
