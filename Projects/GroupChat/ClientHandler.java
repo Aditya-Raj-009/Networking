@@ -7,8 +7,8 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 public class ClientHandler implements Runnable{
-    private static ArrayList<ClientHandler> clients = new ArrayList<>();
-    private Socket socket;
+    public static ArrayList<ClientHandler> clients = new ArrayList<>();
+    public Socket socket;
     private DataOutputStream outputStream;
     private DataInputStream inputStream;
     private String clientName;
@@ -21,7 +21,7 @@ public class ClientHandler implements Runnable{
             inputStream = new DataInputStream(socket.getInputStream());
             clientName = inputStream.readUTF();
             clients.add(this);
-            broadCastMessage(clientName+" has joined the room.");
+            broadCastMessage("\n"+clientName+" has joined the room.");
 
         }
         catch (Exception e)
@@ -33,22 +33,22 @@ public class ClientHandler implements Runnable{
     private void broadCastMessage(String msg) {
 
 
-            clients.forEach((i)->{
-                if(i!=this)
-                {
-                    try {
-                        i.outputStream.writeUTF(msg);
-                        i.outputStream.flush();
+            if(!clients.isEmpty()) {
+                clients.forEach((i) -> {
+                    if (i!=null && !i.socket.isClosed() && i != this) {
+                        try {
+
+                            i.outputStream.writeUTF(msg);
+                            i.outputStream.flush();
+
+                        } catch (Exception e) {
+                            closeSocket(socket, outputStream, inputStream);
+                        }
+
                     }
-                    catch (Exception e)
-                    {
-                        closeSocket(socket,outputStream,inputStream);
-                    }
+                });
 
-                }
-            });
-
-
+            }
 
 
     }
